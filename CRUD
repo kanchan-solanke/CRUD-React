@@ -1,0 +1,87 @@
+import React, { useState } from "react";
+import ReactDOM from "react-dom";
+
+export default function CRUD() {
+  const [books, setBooks] = useState([]);
+  const [currentBook, setCurrentBook] = useState({
+    id: null,
+    title: "",
+    author: "",
+  });
+  const [editing, setEditing] = useState(false);
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setCurrentBook({ ...currentBook, [name]: value });
+  };
+
+  const addBook = () => {
+    if (!currentBook.title || !currentBook.author) return;
+    setBooks([
+      ...books,
+      {
+        id: books.length + 1,
+        title: currentBook.title,
+        author: currentBook.author,
+      },
+    ]);
+    setCurrentBook({ id: null, title: "", author: "" });
+  };
+
+  const deleteBook = (id) => {
+    setBooks(books.filter((book) => book.id !== id));
+  };
+
+  const editBook = (book) => {
+    setEditing(true);
+    setCurrentBook({ id: book.id, title: book.title, author: book.author });
+  };
+
+  const updateBook = () => {
+    setBooks(
+      books.map((book) => (book.id === currentBook.id ? currentBook : book))
+    );
+    setEditing(false);
+    setCurrentBook({ id: null, title: "", author: "" });
+  };
+
+  return (
+    <div>
+      <h2>Bookstore App</h2>
+      <div>
+        <input
+          type="text"
+          name="title"
+          placeholder="Book Title"
+          value={currentBook.title}
+          onChange={handleInputChange}
+        />
+        <input
+          type="text"
+          name="author"
+          placeholder="Author"
+          value={currentBook.author}
+          onChange={handleInputChange}
+        />
+        {editing ? (
+          <button onClick={updateBook}>Update Book</button>
+        ) : (
+          <button onClick={addBook}>Add Book</button>
+        )}
+      </div>
+      <table>
+        <tr>
+          {books.map((book) => (
+            <td key={book.id}>
+              {book.title} by {book.author}{" "}
+              <button onClick={() => editBook(book)}>Edit</button>{" "}
+              <button onClick={() => deleteBook(book.id)}>Delete</button>
+            </td>
+          ))}
+        </tr>
+      </table>
+    </div>
+  );
+}
+
+ReactDOM.render(<CRUD />, document.getElementById("root"));
